@@ -1,0 +1,289 @@
+.dashboard {
+  --ink: #eff5ff;
+  --muted: #a9b7c8;
+  --faint: #718096;
+  --line: rgba(199, 218, 238, 0.18);
+  --panel: rgba(10, 22, 37, 0.88);
+  --panel-strong: rgba(8, 18, 31, 0.95);
+  --yellow: #ffd84d;
+  --green: #51d49a;
+  --red: #ff766c;
+  position: relative;
+  isolation: isolate;
+  width: 100vw;
+  height: 100svh;
+  min-height: 600px;
+  overflow: hidden;
+  background: #0a1420;
+  color: var(--ink);
+}
+
+.map-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.map-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(4, 12, 22, 0.82) 0%, rgba(4, 12, 22, 0.24) 21%, transparent 48%, rgba(4, 12, 22, 0.74) 100%),
+    linear-gradient(90deg, rgba(5, 14, 25, 0.54), transparent 32%, transparent 68%, rgba(5, 14, 25, 0.54));
+}
+
+.topbar,
+.panel,
+.bottom-controls {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.24), inset 0 1px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(18px) saturate(120%);
+}
+
+.topbar {
+  position: absolute;
+  z-index: 2;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: minmax(245px, 1fr) auto minmax(245px, 1fr);
+  align-items: center;
+  gap: 24px;
+  padding: 12px 16px;
+  border-radius: 14px;
+}
+
+.brand,
+.guidance,
+.top-controls,
+.panel-heading,
+.car-top,
+.booking-footer,
+.car-meta,
+.metrics,
+.stat-row,
+.queue-item,
+.bottom-controls {
+  display: flex;
+  align-items: center;
+}
+
+.brand { gap: 12px; }
+
+.brand-mark {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  place-items: center;
+  border-radius: 11px;
+  color: #132033;
+  background: var(--yellow);
+  font-size: 27px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.brand-title,
+h2,
+strong,
+b { color: var(--ink); }
+
+.brand-title {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.brand-subtitle,
+.guidance-distance,
+small,
+.car-meta { color: var(--muted); }
+
+.brand-subtitle { margin-top: 4px; font-size: 11px; }
+.brand-subtitle span { color: var(--yellow); padding: 0 3px; }
+
+.guidance { justify-self: center; gap: 10px; }
+.guidance-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(255, 216, 77, 0.35);
+  border-radius: 50%;
+  color: var(--yellow);
+  font-size: 20px;
+}
+.guidance strong { display: block; margin-top: 2px; font-size: 13px; }
+.guidance-distance { margin-left: 8px; font-size: 12px; font-weight: 700; }
+
+.eyebrow {
+  color: #91a2b6;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.top-controls { justify-self: end; gap: 8px; }
+.segmented {
+  display: flex;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(3, 12, 22, 0.48);
+}
+.segmented button {
+  min-width: 55px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 5px;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 750;
+  text-transform: capitalize;
+}
+.segmented.compact button { min-width: 30px; }
+.segmented button:hover { color: var(--ink); }
+.segmented button.selected { color: #172132; background: var(--yellow); }
+.status-dot { width: 8px; height: 8px; margin-left: 5px; border-radius: 50%; background: #748397; box-shadow: 0 0 0 4px rgba(116, 131, 151, 0.16); }
+.status-dot.running { background: var(--green); box-shadow: 0 0 0 4px rgba(81, 212, 154, 0.16); }
+.status-dot.paused { background: var(--yellow); }
+
+.panel {
+  position: absolute;
+  z-index: 1;
+  width: min(298px, calc(100vw - 40px));
+  padding: 18px;
+  border-radius: 14px;
+}
+.panel-heading,
+.car-top { justify-content: space-between; gap: 12px; }
+h2 { margin: 4px 0 0; font-size: 18px; line-height: 1.1; letter-spacing: -0.025em; }
+
+.driver-console { top: 116px; left: 20px; }
+.ring { display: grid; width: 46px; height: 46px; place-content: center; border: 3px solid var(--yellow); border-left-color: rgba(255, 216, 77, 0.2); border-radius: 50%; text-align: center; }
+.ring span { color: var(--yellow); font-size: 11px; font-weight: 800; }
+.ring small { font-size: 7px; line-height: 1; }
+.earnings { display: flex; align-items: end; justify-content: space-between; margin: 18px 0 13px; padding: 12px 0; border-block: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+.earnings strong { font-size: 23px; line-height: 1; letter-spacing: -0.04em; }
+.stat-list { display: grid; gap: 10px; }
+.stat-row { gap: 9px; font-size: 11px; }
+.stat-icon { color: var(--yellow); font-size: 18px; line-height: 0; }
+.stat-row div { display: grid; gap: 2px; }
+.stat-row small { font-size: 9px; }
+.stat-row strong { margin-left: auto; font-size: 12px; }
+
+.live-booking { top: 116px; right: 20px; }
+.rush,
+.online,
+.queue-count { border-radius: 20px; color: var(--yellow); background: rgba(255, 216, 77, 0.12); font-size: 9px; font-weight: 800; letter-spacing: 0.06em; padding: 5px 7px; text-transform: uppercase; }
+.destination-block { margin: 17px 0; padding: 13px; border-radius: 9px; background: rgba(255, 255, 255, 0.06); }
+.destination-label { margin-bottom: 4px; color: var(--muted); font-size: 10px; }
+.destination-block strong { font-size: 14px; }
+.mini-progress,
+.car-progress,
+.timeline { overflow: hidden; background: rgba(231, 240, 255, 0.14); }
+.mini-progress { height: 3px; margin-top: 12px; border-radius: 3px; }
+.mini-progress span,
+.car-progress span,
+.timeline-fill { display: block; height: 100%; border-radius: inherit; background: var(--yellow); }
+.metrics { justify-content: space-between; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.metrics > div { display: grid; gap: 5px; }
+.metrics strong { font-size: 11px; }
+.booking-route { display: grid; grid-template-columns: 18px 1fr; column-gap: 9px; padding-top: 14px; }
+.booking-route b { display: block; margin: 3px 0; font-size: 11px; }
+.booking-route small { font-size: 9px; }
+.route-pin { width: 10px; height: 10px; margin: 5px 0 0 3px; border: 2px solid var(--yellow); border-radius: 50%; }
+.route-pin.drop { border-radius: 2px; background: var(--red); border-color: var(--red); }
+.booking-footer { justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 9px; font-weight: 700; text-transform: uppercase; }
+.avatars { color: var(--yellow); letter-spacing: -2px; }
+
+.route-queue { bottom: 94px; left: 20px; }
+.queue-count { color: var(--muted); background: rgba(255, 255, 255, 0.08); }
+.queue-list { display: grid; gap: 2px; margin-top: 13px; }
+.queue-item { width: 100%; gap: 9px; padding: 9px 7px; border: 1px solid transparent; border-radius: 8px; color: var(--muted); background: transparent; cursor: pointer; text-align: left; }
+.queue-item:hover { background: rgba(255, 255, 255, 0.06); }
+.queue-item.active { border-color: rgba(255, 216, 77, 0.4); background: rgba(255, 216, 77, 0.1); }
+.queue-index { color: var(--faint); font-size: 10px; font-weight: 800; }
+.queue-main { display: grid; min-width: 0; gap: 3px; flex: 1; }
+.queue-main b { overflow: hidden; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.queue-main i { color: var(--yellow); font-style: normal; }
+.queue-main small { font-size: 8px; }
+.queue-item > strong { font-size: 11px; }
+
+.car-status { right: 20px; bottom: 94px; }
+.online { color: var(--green); background: rgba(81, 212, 154, 0.1); }
+.car-destination { margin: 17px 0 10px; }
+.car-destination strong { display: block; margin-top: 5px; font-size: 13px; }
+.car-progress { height: 5px; border-radius: 5px; }
+.car-progress span { min-width: 6%; }
+.car-meta { justify-content: space-between; margin-top: 8px; font-size: 9px; }
+
+.bottom-controls {
+  position: absolute;
+  z-index: 2;
+  bottom: 20px;
+  left: 50%;
+  width: min(495px, calc(100vw - 40px));
+  min-height: 54px;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 12px;
+  transform: translateX(-50%);
+}
+.control-square { display: grid; width: 35px; height: 35px; flex: 0 0 35px; place-items: center; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: rgba(255, 255, 255, 0.07); cursor: pointer; font-size: 16px; }
+.control-square:hover { background: rgba(255, 216, 77, 0.18); color: var(--yellow); }
+.timeline { position: relative; height: 4px; flex: 1; border-radius: 4px; }
+.timeline i { position: absolute; top: 50%; width: 8px; height: 8px; border: 2px solid #263549; border-radius: 50%; background: var(--yellow); transform: translate(-50%, -50%); }
+.clock,
+.speed-readout { font-size: 10px; font-weight: 800; }
+.clock { color: var(--muted); }
+.speed-readout { min-width: 22px; color: var(--yellow); }
+
+.taxi-marker { position: relative; width: 45px; height: 65px; }
+.taxi-marker__vehicle { position: absolute; z-index: 2; width: 43px; height: 65px; left: 1px; top: 0; filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.34)); }
+.taxi-marker__pulse { position: absolute; z-index: 0; left: 5px; bottom: 2px; width: 35px; height: 18px; border-radius: 50%; background: rgba(255, 203, 51, 0.34); animation: taxi-pulse 1.9s ease-out infinite; }
+.taxi-marker__shadow { position: absolute; z-index: 1; left: 9px; bottom: 4px; width: 27px; height: 8px; border-radius: 50%; background: rgba(0, 0, 0, 0.34); filter: blur(2px); }
+.taxi-marker__label { position: absolute; z-index: 3; left: 50%; bottom: -15px; padding: 3px 5px; border-radius: 3px; color: #152033; background: var(--yellow); font-size: 7px; font-weight: 900; letter-spacing: .08em; white-space: nowrap; transform: translateX(-50%); }
+@keyframes taxi-pulse { 0% { transform: scale(0.7); opacity: 0.85; } 100% { transform: scale(1.65); opacity: 0; } }
+
+@media (max-width: 900px) {
+  .topbar { grid-template-columns: 1fr auto; }
+  .guidance { display: none; }
+  .driver-console { top: 106px; }
+  .live-booking { top: 106px; }
+  .route-queue, .car-status { bottom: 84px; }
+}
+
+@media (max-width: 680px) {
+  body { overflow: auto; }
+  .dashboard { height: auto; min-height: 100svh; overflow: auto; padding: 82px 12px 90px; display: grid; grid-template-columns: 1fr; gap: 12px; }
+  .map-canvas { position: fixed; }
+  .map-vignette { position: fixed; background: rgba(4, 12, 22, 0.65); }
+  .topbar { position: fixed; top: 10px; left: 12px; right: 12px; min-height: 60px; padding: 8px 10px; grid-template-columns: 1fr auto; }
+  .brand-mark { width: 34px; height: 34px; flex-basis: 34px; font-size: 22px; }
+  .brand-title { font-size: 10px; }
+  .brand-subtitle { max-width: 185px; overflow: hidden; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+  .top-controls .segmented:first-child { display: none; }
+  .top-controls { gap: 4px; }
+  .status-dot { display: none; }
+  .panel { position: relative; top: auto; right: auto; bottom: auto; left: auto; width: 100%; padding: 16px; }
+  .driver-console, .live-booking, .route-queue, .car-status { inset: auto; }
+  .route-queue { order: 2; }
+  .car-status { order: 3; }
+  .bottom-controls { position: fixed; bottom: 10px; width: calc(100vw - 24px); }
+}
+
+@media (max-width: 390px) {
+  .top-controls .segmented.compact button { min-width: 27px; padding-inline: 5px; }
+  .driver-console .stat-list { grid-template-columns: 1fr; }
+}

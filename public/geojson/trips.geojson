@@ -1,0 +1,15 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "tripId": "TRIP-01", "status": "active", "pickup": "Penn Station", "dropoff": "Central Park South", "fare": 16.5 },
+      "geometry": { "type": "LineString", "coordinates": [[-73.9934,40.7506],[-73.9917,40.7530],[-73.9900,40.7559],[-73.9885,40.7588],[-73.9870,40.7618],[-73.9854,40.7647],[-73.9838,40.7676],[-73.9823,40.7705],[-73.9807,40.7734],[-73.9791,40.7764],[-73.9774,40.7792]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "tripId": "TRIP-02", "status": "upcoming", "pickup": "Central Park South", "dropoff": "Times Square", "fare": 9.8 },
+      "geometry": { "type": "LineString", "coordinates": [[-73.9774,40.7792],[-73.9811,40.7784],[-73.9848,40.7775],[-73.9884,40.7765],[-73.9919,40.7756],[-73.9942,40.7748]] }
+    }
+  ]
+}
