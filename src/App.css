@@ -34,13 +34,118 @@
     linear-gradient(90deg, rgba(5, 14, 25, 0.54), transparent 32%, transparent 68%, rgba(5, 14, 25, 0.54));
 }
 
+.ui-card,
 .topbar,
-.panel,
 .bottom-controls {
-  border: 1px solid var(--line);
-  background: var(--panel);
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.24), inset 0 1px rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(18px) saturate(120%);
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.3), inset 0 1px rgba(255, 255, 255, 0.055);
+  backdrop-filter: blur(20px) saturate(130%);
+}
+
+.ui-card {
+  color: var(--card-foreground);
+  border-radius: var(--radius);
+}
+
+.ui-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 0.625rem;
+  font: inherit;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 140ms ease, background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.ui-button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.ui-button:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.ui-button--default {
+  color: var(--primary-foreground);
+  background: var(--primary);
+  box-shadow: 0 2px 10px rgba(255, 216, 77, 0.16);
+}
+
+.ui-button--default:hover {
+  background: #ffe580;
+  transform: translateY(-1px);
+}
+
+.ui-button--secondary {
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+}
+
+.ui-button--outline {
+  color: var(--foreground);
+  border-color: var(--border);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.ui-button--ghost {
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.ui-button--ghost:hover {
+  color: var(--foreground);
+  background: var(--muted);
+}
+
+.ui-button--destructive {
+  color: white;
+  background: var(--destructive);
+}
+
+.ui-button--default-size { min-height: 2.5rem; padding: 0 1rem; font-size: 0.875rem; }
+.ui-button--sm { min-height: 2rem; padding: 0 0.7rem; font-size: 0.75rem; }
+.ui-button--icon { width: 2.25rem; height: 2.25rem; padding: 0; }
+
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: fit-content;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.32rem 0.58rem;
+  font-size: 0.65rem;
+  font-weight: 750;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.ui-badge--default { color: var(--primary-foreground); background: var(--primary); }
+.ui-badge--secondary { color: var(--secondary-foreground); background: var(--secondary); }
+.ui-badge--outline { color: var(--muted-foreground); border-color: var(--border); background: rgba(255, 255, 255, 0.035); }
+.ui-badge--destructive { color: #ffe5e2; background: rgba(255, 118, 108, 0.16); }
+.ui-badge--success { color: #78e8b3; background: rgba(81, 212, 154, 0.12); }
+
+.simulation-status {
+  text-transform: capitalize;
+}
+
+.simulation-status.running {
+  color: #78e8b3;
+}
+
+.simulation-status.paused {
+  color: var(--primary);
 }
 
 .topbar {
@@ -141,19 +246,15 @@ small,
 }
 .segmented button {
   min-width: 55px;
-  padding: 6px 8px;
-  border: 0;
   border-radius: 5px;
-  color: var(--muted);
-  background: transparent;
-  cursor: pointer;
   font-size: 10px;
   font-weight: 750;
   text-transform: capitalize;
 }
+.segmented .ui-button--sm { min-height: 28px; padding: 0 8px; }
 .segmented.compact button { min-width: 30px; }
 .segmented button:hover { color: var(--ink); }
-.segmented button.selected { color: #172132; background: var(--yellow); }
+.segmented button.selected { color: #172132; background: var(--yellow); box-shadow: 0 2px 8px rgba(255, 216, 77, 0.18); }
 .status-dot { width: 8px; height: 8px; margin-left: 5px; border-radius: 50%; background: #748397; box-shadow: 0 0 0 4px rgba(116, 131, 151, 0.16); }
 .status-dot.running { background: var(--green); box-shadow: 0 0 0 4px rgba(81, 212, 154, 0.16); }
 .status-dot.paused { background: var(--yellow); }
@@ -242,6 +343,8 @@ h2 { margin: 4px 0 0; font-size: 18px; line-height: 1.1; letter-spacing: -0.025e
 }
 .control-square { display: grid; width: 35px; height: 35px; flex: 0 0 35px; place-items: center; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: rgba(255, 255, 255, 0.07); cursor: pointer; font-size: 16px; }
 .control-square:hover { background: rgba(255, 216, 77, 0.18); color: var(--yellow); }
+.control-square.ui-button--icon { width: 38px; height: 38px; border-color: var(--border); border-radius: 10px; }
+.play-control.ui-button--default { box-shadow: 0 4px 14px rgba(255, 216, 77, 0.2); }
 .timeline { position: relative; height: 4px; flex: 1; border-radius: 4px; }
 .timeline i { position: absolute; top: 50%; width: 8px; height: 8px; border: 2px solid #263549; border-radius: 50%; background: var(--yellow); transform: translate(-50%, -50%); }
 .clock,
@@ -250,7 +353,7 @@ h2 { margin: 4px 0 0; font-size: 18px; line-height: 1.1; letter-spacing: -0.025e
 .speed-readout { min-width: 22px; color: var(--yellow); }
 
 .taxi-marker { position: relative; width: 45px; height: 65px; }
-.taxi-marker__vehicle { position: absolute; z-index: 2; width: 43px; height: 65px; left: 1px; top: 0; filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.34)); }
+.taxi-marker__vehicle { position: absolute; z-index: 2; top: 8px; left: 0; width: 45px; height: 45px; object-fit: contain; filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.34)); }
 .taxi-marker__pulse { position: absolute; z-index: 0; left: 5px; bottom: 2px; width: 35px; height: 18px; border-radius: 50%; background: rgba(255, 203, 51, 0.34); animation: taxi-pulse 1.9s ease-out infinite; }
 .taxi-marker__shadow { position: absolute; z-index: 1; left: 9px; bottom: 4px; width: 27px; height: 8px; border-radius: 50%; background: rgba(0, 0, 0, 0.34); filter: blur(2px); }
 .taxi-marker__label { position: absolute; z-index: 3; left: 50%; bottom: -15px; padding: 3px 5px; border-radius: 3px; color: #152033; background: var(--yellow); font-size: 7px; font-weight: 900; letter-spacing: .08em; white-space: nowrap; transform: translateX(-50%); }

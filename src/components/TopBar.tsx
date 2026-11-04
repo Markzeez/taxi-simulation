@@ -1,5 +1,8 @@
 import { useAppStore } from '../state/store'
 import type { CameraMode, SpeedMultiplier } from '../state/types'
+import { Badge } from './ui/badge'
+import { Button } from './ui/button'
+import { Navigation, Radio } from 'lucide-react'
 
 const modes: CameraMode[] = ['chase', 'top', 'free']
 const speeds: SpeedMultiplier[] = [1, 2, 4, 8]
@@ -22,7 +25,7 @@ export function TopBar() {
       </div>
 
       <div className="guidance">
-        <div className="guidance-icon">↗</div>
+        <div className="guidance-icon"><Navigation size={17} /></div>
         <div>
           <div className="eyebrow">Live guidance</div>
           <strong>On 8th Avenue</strong>
@@ -33,15 +36,40 @@ export function TopBar() {
       <div className="top-controls">
         <div className="segmented">
           {modes.map((item) => (
-            <button key={item} className={mode === item ? 'selected' : ''} onClick={() => setMode(item)}>{item}</button>
+            <Button
+              key={item}
+              size="sm"
+              variant={mode === item ? 'secondary' : 'ghost'}
+              className={mode === item ? 'selected' : ''}
+              aria-pressed={mode === item}
+              onClick={() => setMode(item)}
+            >
+              {item}
+            </Button>
           ))}
         </div>
         <div className="segmented compact">
           {speeds.map((item) => (
-            <button key={item} className={speed === item ? 'selected' : ''} onClick={() => setSpeed(item)}>{item}x</button>
+            <Button
+              key={item}
+              size="sm"
+              variant={speed === item ? 'secondary' : 'ghost'}
+              className={speed === item ? 'selected' : ''}
+              aria-pressed={speed === item}
+              onClick={() => setSpeed(item)}
+            >
+              {item}x
+            </Button>
           ))}
         </div>
-        <div className={`status-dot ${status}`} title={status} />
+        <Badge
+          variant={status === 'running' ? 'success' : 'outline'}
+          className={`simulation-status ${status}`}
+          title={status}
+        >
+          <Radio size={12} />
+          {status}
+        </Badge>
       </div>
     </header>
   )

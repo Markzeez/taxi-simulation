@@ -1,12 +1,13 @@
 import type { Trip } from '../state/types'
 import { Panel, Eyebrow } from './Panel'
+import { Badge } from './ui/badge'
 
 export function LiveBooking({ trip }: { trip: Trip }) {
   const progress = Math.round(trip.progress * 100)
   const eta = Math.max(2, Math.ceil((1 - trip.progress) * 8))
   return (
     <Panel className="live-booking">
-      <div className="panel-heading"><div><Eyebrow>Live booking</Eyebrow><h2>{trip.id}</h2></div><span className="rush">Morning Rush</span></div>
+      <div className="panel-heading"><div><Eyebrow>Live booking</Eyebrow><h2>{trip.id}</h2></div><Badge variant="secondary" className="rush">Morning Rush</Badge></div>
       <div className="destination-block">
         <div className="destination-label">Heading to</div>
         <strong>{trip.dropoff}</strong>

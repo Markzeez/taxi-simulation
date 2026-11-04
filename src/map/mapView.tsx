@@ -1,25 +1,21 @@
 import { useEffect, useRef } from 'react'
 import * as maplibregl from 'maplibre-gl'
 
+import { createTaxiMarkerElement } from '../components/TaxiMarker'
+import { getPositionAtProgress } from '../simulation/tripEngine'
 import { useAppStore } from '../state/store'
 import type { Coordinate } from '../state/types'
-import { getPositionAtProgress } from '../simulation/tripEngine'
-import { createTaxiMarker } from '../components/TaxiMarker'
 
 import { updateCamera } from './cameraController'
-import { createMap } from './mapSetup'
-
 import {
   add3DBuildings,
   addTripLayers,
   updateProgressRoute,
   updateTripRoute,
 } from './mapLayers'
-
-import {
-  addTrailLayer,
-  updateTrail,
-} from './trailLayer'
+import { createMap } from './mapSetup'
+import { addTrailLayer, updateTrail } from './trailLayer'
+import { createTaxiThreeLayer } from './threeTaxiLayer'
 
 function fitMapToRoute(map: maplibregl.Map, coordinates: Coordinate[]) {
   if (coordinates.length === 0) return
@@ -28,7 +24,6 @@ function fitMapToRoute(map: maplibregl.Map, coordinates: Coordinate[]) {
   coordinates.slice(1).forEach((coordinate) => bounds.extend(coordinate))
 
   const isCompact = map.getContainer().clientWidth < 700
-
   map.fitBounds(bounds, {
     padding: isCompact
       ? { top: 75, right: 45, bottom: 160, left: 45 }
@@ -39,276 +34,136 @@ function fitMapToRoute(map: maplibregl.Map, coordinates: Coordinate[]) {
   })
 }
 
+function createTaxiMarker() {
+  return new maplibregl.Marker({
+    element: createTaxiMarkerElement(),
+    rotationAlignment: 'map',
+    pitchAlignment: 'map',
+    anchor: 'center',
+  })
+}
+
 export function MapView() {
   const containerRef = useRef<HTMLDivElement | null>(null)
-
   const mapRef = useRef<maplibregl.Map | null>(null)
   const markerRef = useRef<maplibregl.Marker | null>(null)
-
-  const trailRef = useRef<[number, number][]>([])
+  const taxiLayerRef = useRef<ReturnType<typeof createTaxiThreeLayer> | null>(null)
+  const trailRef = useRef<Coordinate[]>([])
   const lastTripIdRef = useRef<string | null>(null)
+  const activeTripId = useAppStore((state) => state.activeTripId)
 
-  /*
-   * We intentionally don't subscribe to the whole store here.
-   * The simulation loop reads the latest Zustand state with
-   * useAppStore.getState().
-   */
-  const activeTrip = useAppStore((state) =>
-    state.trips.find((trip) => trip.id === state.activeTripId)
-  )
-
-  /*
-   * ---------------------------------------------------------
-   * MAP INITIALIZATION
-   * ---------------------------------------------------------
-   */
   useEffect(() => {
     if (!containerRef.current) return
 
     const map = createMap(containerRef.current)
-
     mapRef.current = map
 
     const handleMapLoad = () => {
       const state = useAppStore.getState()
+      const trip = state.trips.find((item) => item.id === state.activeTripId)
 
-      const trip = state.trips.find(
-        (item) => item.id === state.activeTripId
-      )
-
-      /*
-       * Add static map content first.
-       */
       add3DBuildings(map)
       addTrailLayer(map)
 
-      /*
-       * If there is an active trip when the map loads,
-       * initialize its route and taxi marker.
-       */
-      if (!trip || trip.routeCoords.length === 0) return
+      if (trip && trip.routeCoords.length > 0) {
+        addTripLayers(map, trip)
+        fitMapToRoute(map, trip.routeCoords)
 
-      addTripLayers(map, trip)
-      map.resize()
-      fitMapToRoute(map, trip.routeCoords)
+        const marker = createTaxiMarker()
+        marker.setLngLat(trip.routeCoords[0]).addTo(map)
+        markerRef.current = marker
+        trailRef.current = [trip.routeCoords[0]]
+        lastTripIdRef.current = trip.id
+      }
 
-      const marker = createTaxiMarker()
-
-      marker
-        .setLngLat(trip.routeCoords[0])
-        .addTo(map)
-
-      markerRef.current = marker
-
-      trailRef.current = [trip.routeCoords[0]]
-
-      updateTrail(map, trailRef.current)
-
-      lastTripIdRef.current = trip.id
+      const taxiLayer = createTaxiThreeLayer()
+      map.addLayer(taxiLayer, map.getLayer('route-points') ? 'route-points' : undefined)
+      taxiLayerRef.current = taxiLayer
+      if (trip?.routeCoords[0]) {
+        taxiLayer.setPosition(trip.routeCoords[0], 0)
+      }
     }
 
     map.on('load', handleMapLoad)
 
-    /*
-     * -------------------------------------------------------
-     * CLEANUP
-     * -------------------------------------------------------
-     */
     return () => {
       map.off('load', handleMapLoad)
-
       markerRef.current?.remove()
       markerRef.current = null
-
       map.remove()
       mapRef.current = null
-
+      taxiLayerRef.current = null
       trailRef.current = []
       lastTripIdRef.current = null
     }
   }, [])
 
-  /*
-   * ---------------------------------------------------------
-   * ACTIVE TRIP CHANGED
-   * ---------------------------------------------------------
-   */
   useEffect(() => {
     const map = mapRef.current
+    if (!map?.isStyleLoaded() || !activeTripId || lastTripIdRef.current === activeTripId) return
 
-    if (!map || !activeTrip) return
+    const trip = useAppStore.getState().trips.find((item) => item.id === activeTripId)
+    if (!trip || trip.routeCoords.length === 0) return
 
-    /*
-     * Don't reset the route when unrelated Zustand state
-     * changes.
-     */
-    if (lastTripIdRef.current === activeTrip.id) return
+    lastTripIdRef.current = trip.id
+    trailRef.current = [trip.routeCoords[0]]
+    updateTripRoute(map, trip)
+    fitMapToRoute(map, trip.routeCoords)
 
-    if (activeTrip.routeCoords.length === 0) return
-
-    lastTripIdRef.current = activeTrip.id
-
-    /*
-     * Reset trail for the new trip.
-     */
-    trailRef.current = [activeTrip.routeCoords[0]]
-
-    /*
-     * Update route layers.
-     */
-    updateTripRoute(map, activeTrip)
-    fitMapToRoute(map, activeTrip.routeCoords)
-
-    /*
-     * Update taxi marker.
-     */
-    if (markerRef.current) {
-      markerRef.current
-        .setLngLat(activeTrip.routeCoords[0])
-        .setRotation(0)
+    if (!markerRef.current) {
+      markerRef.current = createTaxiMarker().addTo(map)
     }
-
-    /*
-     * Reset displayed trail.
-     */
+    markerRef.current.setLngLat(trip.routeCoords[0]).setRotation(0)
+    taxiLayerRef.current?.setPosition(trip.routeCoords[0], 0)
     updateTrail(map, trailRef.current)
-  }, [activeTrip])
+  }, [activeTripId])
 
-  /*
-   * ---------------------------------------------------------
-   * SIMULATION LOOP
-   * ---------------------------------------------------------
-   */
   useEffect(() => {
     const intervalId = window.setInterval(() => {
       const state = useAppStore.getState()
+      if (state.simulationStatus !== 'running') return
 
-      if (state.simulationStatus !== 'running') {
-        return
-      }
-
-      const trip = state.trips.find(
-        (item) => item.id === state.activeTripId
-      )
-
-      if (!trip || trip.routeCoords.length < 2) {
-        return
-      }
-
+      const trip = state.trips.find((item) => item.id === state.activeTripId)
       const map = mapRef.current
       const marker = markerRef.current
+      const taxiLayer = taxiLayerRef.current
 
-      if (!map || !marker) {
-        return
-      }
+      if (!trip || trip.routeCoords.length < 2 || !map || !marker || !taxiLayer) return
 
-      /*
-       * Base trip duration.
-       *
-       * 42 seconds at 1x speed.
-       */
       const durationMs = 42_000 / state.speedMultiplier
+      const nextElapsed = Math.min(state.elapsedMs + 100, durationMs)
+      const progress = Math.min(1, nextElapsed / durationMs)
 
-      /*
-       * Advance simulation by 100ms.
-       */
-      const nextElapsed = Math.min(
-        state.elapsedMs + 100,
-        durationMs
-      )
-
-      const progress = Math.min(
-        1,
-        nextElapsed / durationMs
-      )
-
-      /*
-       * Update Zustand.
-       */
       state.setElapsedMs(nextElapsed)
       state.updateProgress(progress)
 
-      /*
-       * Calculate taxi position from route.
-       */
-      const position = getPositionAtProgress(
-        trip.routeCoords,
-        progress
-      )
+      const position = getPositionAtProgress(trip.routeCoords, progress)
+      if (!position) return
 
-      if (!position) {
-        return
-      }
+      marker.setLngLat(position.lngLat).setRotation(position.bearing)
+      taxiLayer.setPosition(position.lngLat, position.bearing)
+      updateProgressRoute(map, trip.routeCoords, progress)
 
-      /*
-       * Update taxi marker.
-       */
-      marker
-        .setLngLat(position.lngLat)
-        .setRotation(position.bearing)
-
-      /*
-       * Update route progress.
-       */
-      updateProgressRoute(
-        map,
-        trip.routeCoords,
-        progress
-      )
-
-      /*
-       * Camera follows taxi unless the user selected
-       * free camera mode.
-       */
       if (state.cameraMode !== 'free') {
-        updateCamera(
-          map,
-          state.cameraMode,
-          position.lngLat,
-          position.bearing
-        )
+        updateCamera(map, state.cameraMode, position.lngLat, position.bearing)
       }
-
-      /*
-       * -----------------------------------------------------
-       * TRAIL
-       * -----------------------------------------------------
-       */
 
       const lastPosition = trailRef.current.at(-1)
-
       const shouldAddTrailPoint =
         !lastPosition ||
-        Math.abs(
-          lastPosition[0] - position.lngLat[0]
-        ) +
-          Math.abs(
-            lastPosition[1] - position.lngLat[1]
-          ) >
+        Math.abs(lastPosition[0] - position.lngLat[0]) +
+          Math.abs(lastPosition[1] - position.lngLat[1]) >
           0.00012
 
       if (shouldAddTrailPoint) {
         trailRef.current.push(position.lngLat)
-
-        updateTrail(
-          map,
-          trailRef.current
-        )
+        updateTrail(map, trailRef.current)
       }
 
-      /*
-       * -----------------------------------------------------
-       * TRIP COMPLETED
-       * -----------------------------------------------------
-       */
-      if (progress >= 1) {
-        state.completeActiveTrip()
-      }
+      if (progress >= 1) state.completeActiveTrip()
     }, 100)
 
-    return () => {
-      window.clearInterval(intervalId)
-    }
+    return () => window.clearInterval(intervalId)
   }, [])
 
   return (
